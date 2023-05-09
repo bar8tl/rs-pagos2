@@ -1,0 +1,27 @@
+{
+  "konst": {
+    "IMPTO": "002",
+    "TIPOF": "Tasa",
+    "OBJIM": "02",
+    "TAB"  : "edicom",
+    "DEC"  : "2"
+  },
+  "progm": {
+    "inpdr": ".\\files\\input\\",
+    "outdr": ".\\files\\output\\",
+    "ifilt": "!(*processed*)",
+    "inpnm": "dtsys'_'+inpfl'_inp_processed'",
+    "outnm": "dtsys'_'+inpfl'_out'"
+  },
+  "run": [
+    {
+      "optin": "txc", "objnm": "edicom-bbm", "modep": "INDIV",
+      "inpfl": "edicom-bbm.xlsx"
+    },
+    {
+      "optin": "txc", "objnm": "edicom-dc",  "modep": "INDIV",
+      "inpfl": "edicom-dc.xlsx"
+
+    }
+  ]
+}
