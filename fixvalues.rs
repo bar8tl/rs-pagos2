@@ -80,41 +80,42 @@ pub const IRIMP: usize = 42; // retnc_impto_dr
 pub const IRFAC: usize = 43; // retnc_tipof_dr
 pub const IRRTE: usize = 44; // retnc_tasac_dr
 pub const IRAMT: usize = 45; // retnc_impor_dr
-pub const IOBJI: usize = 46; // objeto_impto_dr
+pub const IEQUI: usize = 46; // equivalencia_dr
+pub const IOBJI: usize = 47; // objeto_impto_dr
 // Payment new fields (amounts in payment currency)
-pub const PTB16: usize = 47; // trasl_basei_iva16_p
-pub const PTI16: usize = 48; // trasl_impto_iva16_p
-pub const PTF16: usize = 49; // trasl_tipof_iva16_p
-pub const PTR16: usize = 50; // trasl_tasac_iva16_p
-pub const PTA16: usize = 51; // trasl_impor_iva16_p
-pub const PRB16: usize = 52; // retnc_basei_iva16_p
-pub const PRI16: usize = 53; // retnc_impto_iva16_p
-pub const PRF16: usize = 54; // retnc_tipof_iva16_p
-pub const PRR16: usize = 55; // retnc_tasac_iva16_p
-pub const PRA16: usize = 56; // retnc_impor_iva16_p
-pub const PTB08: usize = 57; // trasl_basei_iva8_p
-pub const PTI08: usize = 58; // trasl_impto_iva8_p
-pub const PTF08: usize = 59; // trasl_tipof_iva8_p
-pub const PTR08: usize = 60; // trasl_tasac_iva8_p
-pub const PTA08: usize = 61; // trasl_impor_iva8_p
-pub const PRB08: usize = 62; // retnc_basei_iva8_p
-pub const PRI08: usize = 63; // retnc_impto_iva8_p
-pub const PRF08: usize = 64; // retnc_tipof_iva8_p
-pub const PRR08: usize = 65; // retnc_tasac_iva8_p
-pub const PRA08: usize = 66; // retnc_impor_iva8_p
-pub const PTB00: usize = 67; // trasl_basei_iva0_p
-pub const PTI00: usize = 68; // trasl_impto_iva0_p
-pub const PTF00: usize = 69; // trasl_tipof_iva0_p
-pub const PTR00: usize = 70; // trasl_tasac_iva0_p
-pub const PTA00: usize = 71; // trasl_impor_iva0_p
-pub const PRB00: usize = 72; // retnc_basei_iva0_p
-pub const PRI00: usize = 73; // retnc_impto_iva0_p
-pub const PRF00: usize = 74; // retnc_tipof_iva0_p
-pub const PRR00: usize = 75; // retnc_tasac_iva0_p
-pub const PRA00: usize = 76; // retnc_impor_iva0_p
+pub const PTB16: usize = 48; // trasl_basei_iva16_p
+pub const PTI16: usize = 49; // trasl_impto_iva16_p
+pub const PTF16: usize = 50; // trasl_tipof_iva16_p
+pub const PTR16: usize = 51; // trasl_tasac_iva16_p
+pub const PTA16: usize = 52; // trasl_impor_iva16_p
+pub const PRB16: usize = 53; // retnc_basei_iva16_p
+pub const PRI16: usize = 54; // retnc_impto_iva16_p
+pub const PRF16: usize = 55; // retnc_tipof_iva16_p
+pub const PRR16: usize = 56; // retnc_tasac_iva16_p
+pub const PRA16: usize = 57; // retnc_impor_iva16_p
+pub const PTB08: usize = 58; // trasl_basei_iva8_p
+pub const PTI08: usize = 59; // trasl_impto_iva8_p
+pub const PTF08: usize = 60; // trasl_tipof_iva8_p
+pub const PTR08: usize = 61; // trasl_tasac_iva8_p
+pub const PTA08: usize = 62; // trasl_impor_iva8_p
+pub const PRB08: usize = 63; // retnc_basei_iva8_p
+pub const PRI08: usize = 64; // retnc_impto_iva8_p
+pub const PRF08: usize = 65; // retnc_tipof_iva8_p
+pub const PRR08: usize = 66; // retnc_tasac_iva8_p
+pub const PRA08: usize = 67; // retnc_impor_iva8_p
+pub const PTB00: usize = 68; // trasl_basei_iva0_p
+pub const PTI00: usize = 69; // trasl_impto_iva0_p
+pub const PTF00: usize = 70; // trasl_tipof_iva0_p
+pub const PTR00: usize = 71; // trasl_tasac_iva0_p
+pub const PTA00: usize = 72; // trasl_impor_iva0_p
+pub const PRB00: usize = 73; // retnc_basei_iva0_p
+pub const PRI00: usize = 74; // retnc_impto_iva0_p
+pub const PRF00: usize = 75; // retnc_tipof_iva0_p
+pub const PRR00: usize = 76; // retnc_tasac_iva0_p
+pub const PRA00: usize = 77; // retnc_impor_iva0_p
 // Differences
-pub const DIFTL: usize = 77; // dif_monto_total_pagos
-pub const DIFPY: usize = 78; // dif_impor_pago
+pub const DIFTL: usize = 78; // dif_monto_total_pagos
+pub const DIFPY: usize = 79; // dif_impor_pago
 // First invoice indicators
 pub const FIT16: usize =  0; // first_invo_trasl_iva16
 pub const FIR16: usize =  1; // first_invo_retnc_iva16
@@ -226,41 +227,42 @@ impl FixvaluesTp {
     self.TT.push(String::from("DR Retencion TipoFactor"     )); // 43
     self.TT.push(String::from("DR Retencion TasaOCuota"     )); // 44
     self.TT.push(String::from("DR Retencion Importe"        )); // 45
-    self.TT.push(String::from("DR Objeto Impuesto"          )); // 46
+    self.TT.push(String::from("DR Equivalencia"             )); // 46
+    self.TT.push(String::from("DR Objeto Impuesto"          )); // 47
     // Payment new fields titles
-    self.TT.push(String::from("P Traslado Base IVA16"       )); // 47
-    self.TT.push(String::from("P Traslado Impuesto IVA16"   )); // 48
-    self.TT.push(String::from("P Traslado TipoFactor IVA16" )); // 49
-    self.TT.push(String::from("P Traslado TasaOCuota IVA16" )); // 50
-    self.TT.push(String::from("P Traslado Importe IVA16"    )); // 51
-    self.TT.push(String::from("P Retencion Base IVA16"      )); // 52
-    self.TT.push(String::from("P Retencion Impuesto IVA16"  )); // 53
-    self.TT.push(String::from("P Retencion TipoFactor IVA16")); // 54
-    self.TT.push(String::from("P Retencion TasaOCuota IVA16")); // 55
-    self.TT.push(String::from("P Retencion Importe IVA16"   )); // 56
-    self.TT.push(String::from("P Traslado Base IVA8"        )); // 57
-    self.TT.push(String::from("P Traslado Impuesto IVA8"    )); // 58
-    self.TT.push(String::from("P Traslado TipoFactor IVA8"  )); // 59
-    self.TT.push(String::from("P Traslado TasaOCuota IVA8"  )); // 60
-    self.TT.push(String::from("P Traslado Importe IVA8"     )); // 61
-    self.TT.push(String::from("P Retencion Base IVA8"       )); // 62
-    self.TT.push(String::from("P Retencion Impuesto IVA8"   )); // 63
-    self.TT.push(String::from("P Retencion TipoFactor IVA8" )); // 64
-    self.TT.push(String::from("P Retencion TasaOCuota IVA8" )); // 65
-    self.TT.push(String::from("P Retencion Importe IVA8"    )); // 66
-    self.TT.push(String::from("P Traslado Base IVA0"        )); // 67
-    self.TT.push(String::from("P Traslado Impuesto IVA0"    )); // 68
-    self.TT.push(String::from("P Traslado TipoFactor IVA0"  )); // 69
-    self.TT.push(String::from("P Traslado TasaOCuota IVA0"  )); // 70
-    self.TT.push(String::from("P Traslado Importe IVA0"     )); // 71
-    self.TT.push(String::from("P Retencion Base IVA0"       )); // 72
-    self.TT.push(String::from("P Retencion Impuesto IVA0"   )); // 73
-    self.TT.push(String::from("P Retencion TipoFactor IVA0" )); // 74
-    self.TT.push(String::from("P Retencion TasaOCuota IVA0" )); // 75
-    self.TT.push(String::from("P Retencion Importe IVA0"    )); // 76
+    self.TT.push(String::from("P Traslado Base IVA16"       )); // 48
+    self.TT.push(String::from("P Traslado Impuesto IVA16"   )); // 49
+    self.TT.push(String::from("P Traslado TipoFactor IVA16" )); // 50
+    self.TT.push(String::from("P Traslado TasaOCuota IVA16" )); // 51
+    self.TT.push(String::from("P Traslado Importe IVA16"    )); // 52
+    self.TT.push(String::from("P Retencion Base IVA16"      )); // 53
+    self.TT.push(String::from("P Retencion Impuesto IVA16"  )); // 54
+    self.TT.push(String::from("P Retencion TipoFactor IVA16")); // 55
+    self.TT.push(String::from("P Retencion TasaOCuota IVA16")); // 56
+    self.TT.push(String::from("P Retencion Importe IVA16"   )); // 57
+    self.TT.push(String::from("P Traslado Base IVA8"        )); // 58
+    self.TT.push(String::from("P Traslado Impuesto IVA8"    )); // 59
+    self.TT.push(String::from("P Traslado TipoFactor IVA8"  )); // 60
+    self.TT.push(String::from("P Traslado TasaOCuota IVA8"  )); // 61
+    self.TT.push(String::from("P Traslado Importe IVA8"     )); // 62
+    self.TT.push(String::from("P Retencion Base IVA8"       )); // 63
+    self.TT.push(String::from("P Retencion Impuesto IVA8"   )); // 64
+    self.TT.push(String::from("P Retencion TipoFactor IVA8" )); // 65
+    self.TT.push(String::from("P Retencion TasaOCuota IVA8" )); // 66
+    self.TT.push(String::from("P Retencion Importe IVA8"    )); // 67
+    self.TT.push(String::from("P Traslado Base IVA0"        )); // 68
+    self.TT.push(String::from("P Traslado Impuesto IVA0"    )); // 69
+    self.TT.push(String::from("P Traslado TipoFactor IVA0"  )); // 70
+    self.TT.push(String::from("P Traslado TasaOCuota IVA0"  )); // 71
+    self.TT.push(String::from("P Traslado Importe IVA0"     )); // 72
+    self.TT.push(String::from("P Retencion Base IVA0"       )); // 73
+    self.TT.push(String::from("P Retencion Impuesto IVA0"   )); // 74
+    self.TT.push(String::from("P Retencion TipoFactor IVA0" )); // 75
+    self.TT.push(String::from("P Retencion TasaOCuota IVA0" )); // 76
+    self.TT.push(String::from("P Retencion Importe IVA0"    )); // 77
     // Differences
-    self.TT.push(String::from("Diff Monto Total Pagos"      )); // 77
-    self.TT.push(String::from("Diff Importe Pago"           )); // 78
+    self.TT.push(String::from("Diff Monto Total Pagos"      )); // 78
+    self.TT.push(String::from("Diff Importe Pago"           )); // 79
     // Indexes for common numeric fields
     self.NUMER.push(AMOUN); //  6 = amount_doc_curr
     self.NUMER.push(PRVAM); // 12 = importe_saldo_anterior

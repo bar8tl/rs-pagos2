@@ -40,6 +40,7 @@ pub struct Pagos2Tp {
   pub ipp  : usize,            // Index for invoices within a payments
   pub fline: bool,             // First line in input file
   pub recn : i32,              // Input file records number
+  pub doctp: String,           // Document type
   pub oline: String,           // Output line
 }
 
@@ -56,14 +57,16 @@ impl Pagos2Tp {
     self.t = ItablesTp::new_itables();
     self.t.get_itables();
     self.allocate_storage(); // allocate memory for work vectors
-    let mut OF = File::create("ofile.txt").expect("creation failed");
+    let mut OF = File::create(format!("{}{}", self.s.outdr, self.s.inpfl))
+      .expect("creation failed");
     let mut i: usize = 0;
     let mut excel: Xlsx<_> = open_workbook(&self.s.inppt).unwrap();
-    if let Some(Ok(r)) = excel.worksheet_range("edicom") {
+    if let Some(Ok(r)) = excel.worksheet_range(TAB) {
       for row in r.rows() {
         let s = stg.clone();
         self.get_linefields(row, i);
-        match self.t.seek_doctp(&self.lxs[CMPNY], &self.lxs[DOCTP]).as_str() {
+        self.doctp = self.t.seek_doctp(&self.lxs[CMPNY], &self.lxs[DOCTP]);
+        match self.doctp.as_str() {
           TITLE => { self.print_title(&mut OF);   },
           PAYMT => { self.proc_paymline(&mut OF); },
           INVOI => { self.proc_involine();        },
@@ -74,6 +77,8 @@ impl Pagos2Tp {
         self.lxf = Default::default();
       }
       self.build_paymline(&mut OF).build_involines(&mut OF);
+      ren_inpfile(self.s.inpdr.clone(), self.s.inpfl.clone());
+      ren_outfile(self.s.outdr.clone(), self.s.inpfl.clone());
     }
   }
 
@@ -94,8 +99,8 @@ impl Pagos2Tp {
     let wrate: f32 = txdta.wrate;
     let amtic: f32 = self.lxf[PYAMT];
     let mut convf: f32 = 1.0;
-    if self.lps[CURCY] == "MXN".to_string() {
-      if self.lxs[CURCY] == "MXN".to_string() {
+    if self.lps[CURCY] == MXN.to_string() {
+      if self.lxs[CURCY] == MXN.to_string() {
         convf = 1.0;
       } else {
         convf = 1.0 / self.lxf[EXCHG];
@@ -103,14 +108,16 @@ impl Pagos2Tp {
     } else {
       convf = self.lpf[EXCHG];
     }
-    self.lis[IOBJI] = self.s.OBJIM.clone();
-    self.lif[ITBAS] = amtic / (1.0 + trate - wrate);
-    self.ljf[ITBAS] = amtic / (1.0 + trate - wrate) * convf;
-    self.lis[ITIMP] = self.s.IMPTO.clone();
-    self.lis[ITFAC] = self.s.TIPOF.clone();
-    self.lif[ITRTE] = trate;
-    self.lif[ITAMT] = self.lif[ITBAS] * trate;
-    self.ljf[ITAMT] = self.lif[ITBAS] * trate * convf;
+    self.lis[IOBJI]  = self.s.OBJIM.clone();
+    self.lif[ITBAS]  = amtic / (1.0 + trate - wrate);
+    self.ljf[ITBAS]  = amtic / (1.0 + trate - wrate) * convf;
+    self.lis[ITIMP]  = self.s.IMPTO.clone();
+    self.lis[ITFAC]  = self.s.TIPOF.clone();
+    self.lif[ITRTE]  = trate;
+    self.lif[ITAMT]  = self.lif[ITBAS] * trate;
+    self.ljf[ITAMT]  = self.lif[ITBAS] * trate * convf;
+    self.cif[TPAYM] += amtic;
+    self.cjf[TPAYM] += amtic * convf;
     if trate == 0.16 {
       self.cif[PTB16] += self.lif[ITBAS];
       self.cjf[PTB16] += self.ljf[ITBAS];
@@ -190,7 +197,7 @@ impl Pagos2Tp {
               self.lxs[j] = format!("{:.6}", rb_round(rslt, 6));
             },
             Err(error) => {
-              if temp == "" || temp == "MXN"{
+              if temp == "" || temp == MXN {
                 self.lxf[j] = 1.0;
               }
             }
@@ -203,8 +210,7 @@ impl Pagos2Tp {
         }
       }
     }
-    if self.lxs[DOCTP].as_str() == "DZ" ||
-       self.lxs[DOCTP].as_str() == "PK"{
+    if self.doctp.as_str() == PAYMT {
       if self.lxf[PYAMT] == 0.0 {
         self.lxs[PYAMT] = "".to_string();
       }
@@ -222,7 +228,7 @@ impl Pagos2Tp {
       self.lps[i] = self.lxs[i].clone();
       self.lpf[i] = self.lxf[i].clone();
     }
-    if self.lxs[CURCY] == "MXN".to_string() {
+    if self.lxs[CURCY] == MXN.to_string() {
       self.lpf[EXCHG] = 1.0;
     } else {
       self.lpf[EXCHG] = self.lxf[EXCHG];
@@ -305,7 +311,7 @@ impl Pagos2Tp {
       self.gif[i] = Default::default();
       self.gjf[i] = Default::default();
     }
-    for i in 0..=78 {
+    for i in 0..=79 {
       self.lps[i] = "".to_string();
       self.lpf[i] = 0.0;
       self.lis[i] = "".to_string();
@@ -325,6 +331,7 @@ impl Pagos2Tp {
     self.lpf[TTA08] = self.cjf[PTA08].clone();
     self.lpf[TTB00] = self.cjf[PTB00].clone();
     self.lpf[TTA00] = self.cjf[PTA00].clone();
+    self.lpf[TPAYM] = self.cjf[TPAYM].clone();
     self.lpf[PTB16] = self.cjf[PTB16].clone();
     self.lpf[PTA16] = self.cjf[PTA16].clone();
     self.lpf[PRB16] = self.cjf[PRB16].clone();
@@ -350,7 +357,7 @@ impl Pagos2Tp {
 
   fn print_title(&mut self, mut OF: &mut File) {
     self.recn += 1;
-    for i in 0..=78 {
+    for i in 0..=79 {
       self.app_strline(self.k.TT[i].clone());
     }
     OF.write_all(self.oline.as_bytes()).expect("write failed");
@@ -359,11 +366,11 @@ impl Pagos2Tp {
 
   fn print_paymline(&mut self, mut OF: &mut File) {
     self.recn += 1;
-    for i in 0..=78 { // Print original columns
+    for i in 0..=79 { // Print original columns
       if i <= 27 {
         self.app_strline(self.lps[i].clone());
       }
-      if i >= 28 && i <= 78 {
+      if i >= 28 && i <= 79 {
         if contains(&self.k.ALPHA, &i) {
           self.app_strline(self.lps[i].clone());
         } else {
@@ -378,11 +385,11 @@ impl Pagos2Tp {
   fn print_involine(&mut self, mut OF: &mut File, lis: LineInvoStr,
     lif: LineInvoNum) {
     self.recn += 1;
-    for i in 0..=78 {
+    for i in 0..=79 {
       if i <= 27 {
         self.app_strline(lis[i].clone());
       }
-      if i >= 28 && i <= 78 {
+      if i >= 28 && i <= 79 {
         if contains(&self.k.ALPHA, &i) {
           self.app_strline(lis[i].clone());
         } else {
@@ -412,7 +419,7 @@ impl Pagos2Tp {
     for i in 0..self.fiv.len()-1 {
       self.fiv[i] = true;
     }
-    for i in 0..=78 {
+    for i in 0..=79 {
       self.lps.push("".to_string());
       self.lpf.push(0.0);
       self.lis.push("".to_string());
