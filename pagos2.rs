@@ -1,7 +1,5 @@
-/*******************************************************************************
-** pagos2.rs: Extend Pagos1.0 EDICOM-file with Pagos2.0 fields (Core Logic)    *
-** [20220406-BAR8TL]                                                           *
-*******************************************************************************/
+// pagos2.rs: Extend Pagos1.0 EDICOM-file with Pagos2.0 fields (Core Logic) ----
+// [20220406-BAR8TL]
 #![allow(unused)]
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
@@ -50,14 +48,14 @@ impl Pagos2Tp {
     p
   }
 
-  pub fn proc_indiv_file(&mut self, stg: SettingsTp, f: &str) {
+  pub fn proc_indiv_file(&mut self, stg: SettingsTp, fnm: &str, fex: &str) {
     self.s = stg.clone();
     self.k = FixvaluesTp::new_fixvalues();
     self.k.set_fixvalues();
     self.t = ItablesTp::new_itables();
     self.t.get_itables();
     self.allocate_storage(); // allocate memory for work vectors
-    let mut OF = File::create(format!("{}{}", self.s.outdr, self.s.inpfl))
+    let mut OF = File::create(format!("{}{}.lot", self.s.outdr, fnm))
       .expect("creation failed");
     let mut i: usize = 0;
     let mut excel: Xlsx<_> = open_workbook(&self.s.inppt).unwrap();
@@ -65,6 +63,7 @@ impl Pagos2Tp {
       for row in r.rows() {
         let s = stg.clone();
         self.get_linefields(row, i);
+        println!("{:?} {:?}", self.lxs, self.lxf);
         self.doctp = self.t.seek_doctp(&self.lxs[CMPNY], &self.lxs[DOCTP]);
         match self.doctp.as_str() {
           TITLE => { self.print_title(&mut OF);   },
@@ -77,8 +76,10 @@ impl Pagos2Tp {
         self.lxf = Default::default();
       }
       self.build_paymline(&mut OF).build_involines(&mut OF);
-      ren_inpfile(self.s.inpdr.clone(), self.s.inpfl.clone());
-      ren_outfile(self.s.outdr.clone(), self.s.inpfl.clone());
+      if self.s.renam == "yes" {
+        ren_file("inp", self.s.inpdr.clone(), fnm, fex);
+        ren_file("out", self.s.outdr.clone(), fnm, fex);
+      }
     }
   }
 
@@ -98,15 +99,9 @@ impl Pagos2Tp {
     let trate: f32 = txdta.trate;
     let wrate: f32 = txdta.wrate;
     let amtic: f32 = self.lxf[PYAMT];
-    let mut convf: f32 = 1.0;
-    if self.lps[CURCY] == MXN.to_string() {
-      if self.lxs[CURCY] == MXN.to_string() {
-        convf = 1.0;
-      } else {
-        convf = 1.0 / self.lxf[EXCHG];
-      }
-    } else {
-      convf = self.lpf[EXCHG];
+    let mut convf: f32 = self.lxf[EXCHG];;
+    if self.lps[CURCY] == MXN && self.lxs[CURCY] == MXN {
+      convf = 1.0;
     }
     self.lis[IOBJI]  = self.s.OBJIM.clone();
     self.lif[ITBAS]  = amtic / (1.0 + trate - wrate);
@@ -228,7 +223,7 @@ impl Pagos2Tp {
       self.lps[i] = self.lxs[i].clone();
       self.lpf[i] = self.lxf[i].clone();
     }
-    if self.lxs[CURCY] == MXN.to_string() {
+    if self.lxs[CURCY] == MXN {
       self.lpf[EXCHG] = 1.0;
     } else {
       self.lpf[EXCHG] = self.lxf[EXCHG];
@@ -324,26 +319,28 @@ impl Pagos2Tp {
   }
 
   fn build_paymline(&mut self, mut OF: &mut File) -> &mut Pagos2Tp {
-    self.lpf[TRETN] = self.cjf[PRA16] + self.cjf[PRA08] + self.cjf[PRA00];
-    self.lpf[TTB16] = self.cjf[PTB16].clone();
-    self.lpf[TTA16] = self.cjf[PTA16].clone();
-    self.lpf[TTB08] = self.cjf[PTB08].clone();
-    self.lpf[TTA08] = self.cjf[PTA08].clone();
-    self.lpf[TTB00] = self.cjf[PTB00].clone();
-    self.lpf[TTA00] = self.cjf[PTA00].clone();
-    self.lpf[TPAYM] = self.cjf[TPAYM].clone();
-    self.lpf[PTB16] = self.cjf[PTB16].clone();
-    self.lpf[PTA16] = self.cjf[PTA16].clone();
-    self.lpf[PRB16] = self.cjf[PRB16].clone();
-    self.lpf[PRA16] = self.cjf[PRA16].clone();
-    self.lpf[PTB08] = self.cjf[PTB08].clone();
-    self.lpf[PTA08] = self.cjf[PTA08].clone();
-    self.lpf[PRB08] = self.cjf[PRB08].clone();
-    self.lpf[PRA08] = self.cjf[PRA08].clone();
-    self.lpf[PTB00] = self.cjf[PTB00].clone();
-    self.lpf[PTA00] = self.cjf[PTA00].clone();
-    self.lpf[PRB00] = self.cjf[PRB00].clone();
-    self.lpf[PRA00] = self.cjf[PRA00].clone();
+    self.lpf[TRETN] = (self.cjf[PRA16]
+                     + self.cjf[PRA08]
+                     + self.cjf[PRA00]) * self.lpf[EXCHG];
+    self.lpf[TTB16]  = self.cjf[PTB16]  * self.lpf[EXCHG];
+    self.lpf[TTA16]  = self.cjf[PTA16]  * self.lpf[EXCHG];
+    self.lpf[TTB08]  = self.cjf[PTB08]  * self.lpf[EXCHG];
+    self.lpf[TTA08]  = self.cjf[PTA08]  * self.lpf[EXCHG];
+    self.lpf[TTB00]  = self.cjf[PTB00]  * self.lpf[EXCHG];
+    self.lpf[TTA00]  = self.cjf[PTA00]  * self.lpf[EXCHG];
+    self.lpf[TPAYM]  = self.cjf[TPAYM]  * self.lpf[EXCHG];
+    self.lpf[PTB16]  = self.cjf[PTB16].clone();
+    self.lpf[PTA16]  = self.cjf[PTA16].clone();
+    self.lpf[PRB16]  = self.cjf[PRB16].clone();
+    self.lpf[PRA16]  = self.cjf[PRA16].clone();
+    self.lpf[PTB08]  = self.cjf[PTB08].clone();
+    self.lpf[PTA08]  = self.cjf[PTA08].clone();
+    self.lpf[PRB08]  = self.cjf[PRB08].clone();
+    self.lpf[PRA08]  = self.cjf[PRA08].clone();
+    self.lpf[PTB00]  = self.cjf[PTB00].clone();
+    self.lpf[PTA00]  = self.cjf[PTA00].clone();
+    self.lpf[PRB00]  = self.cjf[PRB00].clone();
+    self.lpf[PRA00]  = self.cjf[PRA00].clone();
     self.print_paymline(OF);
     self
   }
@@ -409,7 +406,8 @@ impl Pagos2Tp {
     if val == 0.0 {
       self.oline.push_str(format!("|").as_str());
     } else {
-      self.oline.push_str(format!("{}|", &val).as_str());
+      self.oline.push_str(format!("{:.2}|", rb_round(val, self.s.DECPS))
+        .as_str());
     }
   }
 

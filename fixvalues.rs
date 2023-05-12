@@ -1,7 +1,5 @@
-/*******************************************************************************
-** fixvalues.rs: Constants defined for default values for program settings     *
-** [20220406-BAR8TL]                                                           *
-*******************************************************************************/
+// fixvalues.rs: Constants defined for default values for program settings
+// [20220406-BAR8TL]
 #![allow(unused)]
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
@@ -18,19 +16,20 @@ pub const SAMPL: &str  = "sample.xlsx";                    // SAMPLE_FILE
 pub const IFILT: &str  = "!(*processed*)";                 // INPUTS_FILTER
 pub const INPNM: &str  = "dtsys'_'+inpfl'_inp_processed'"; // INPUTS_NAMING
 pub const OUTNM: &str  = "dtsys'_'+inpfl'_out'";           // OUTPUTS_NAMING
+pub const RENAM: &str  = "no";                             // RENAME_FILES
 pub const IMPTO: &str  = "002";                            // IMPUESTO
 pub const TIPOF: &str  = "Tasa";                           // TIPOFACTOR
 pub const OBJIM: &str  = "02";                             // OBJETOIMPUESTO
 pub const MXN  : &str  = "MXN";                            // TOTALS_CURRENCY
 pub const TAB  : &str  = "edicom";                         // TAB
-pub const DEC  : &str  = "2";                              // DEC
+pub const DEC  : &str  = "2";                              // DEC_POSITIONS
 pub const BATCH: &str  = "BATCH";                          // BATCH
 pub const INDIV: &str  = "INDIV";                          // INDIV
 pub const TITLE: &str  = "TITLE";                          // TITLE_LINE
 pub const PAYMT: &str  = "PAYMT";                          // PAYMENT_LINE
 pub const INVOI: &str  = "INVOI";                          // INVOICE_LINE
 
-// Indexes for readibility - Position Excel columns and Indexes for arrays
+// Indexes for readibility - Position of Excel columns and Indexes for arrays
 // Source fields: Common to Payment lines (DZ) and Invoice lines (RV)
 pub const CMPNY: usize =  0; // company_code
 pub const CUSTO: usize =  1; // customer
@@ -160,9 +159,7 @@ pub const ITABLES: &str = r#"
 }
 "#;
 
-/*******************************************************************************
-** Fixvalues - Fixed values structures                                         *
-*******************************************************************************/
+// Fixvalues - Fixed values structures
 #[derive(Debug, Clone, Default)]
 pub struct FixvaluesTp {
   pub TT   : Vec<String>,
@@ -177,7 +174,6 @@ impl FixvaluesTp {
   }
 
   pub fn set_fixvalues(&mut self) {
-    // Load Titles table
     // Source fields titles    ....+....1....+....2....+...
     self.TT.push(String::from("Company Code"                )); //  0
     self.TT.push(String::from("Customer"                    )); //  1
@@ -290,9 +286,7 @@ impl FixvaluesTp {
   }
 }
 
-/*******************************************************************************
-** itables - Upload internal tables                                            *
-*******************************************************************************/
+// itables - Upload internal tables
 #[derive(Debug, Clone, Default, Deserialize)]
 pub struct DoctypesTp {
   pub code : String,

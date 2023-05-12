@@ -1,7 +1,5 @@
-/*******************************************************************************
-** settings.rs: Defines Pagos 2.0 Excel File pgm-level & run-level settings    *
-** [20220406-BAR8TL]                                                           *
-*******************************************************************************/
+// settings.rs: Defines Pagos 2.0 Excel File pgm-level & run-level settings ----
+// [20220406-BAR8TL]
 #![allow(unused)]
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
@@ -15,9 +13,7 @@ use serde_json;
 use std::fs::File;
 use std::env;
 
-/*******************************************************************************
-** settings.rs: Establishes program and run level settings                     *
-*******************************************************************************/
+// settings - Establishes program and run level settings -----------------------
 #[derive(Debug, Clone, Default)]
 pub struct SettingsTp {
   pub prm  : ParamsTp,
@@ -31,6 +27,7 @@ pub struct SettingsTp {
   pub inpdr: String,       // INPUTS_DIR
   pub outdr: String,       // OUTPUTS_DIR
   pub ifilt: String,       // INPUTS_FILTER
+  pub renam: String,       // RENAME_FILES
   pub inpnm: String,       // INPUTS_NAMING
   pub outnm: String,       // OUTPUTS_NAMING
   pub optin: String,       // OPTION
@@ -70,6 +67,8 @@ impl SettingsTp {
       { c.progm.outdr.clone() } else { OUTDR.to_string() };
     self.ifilt = if c.progm.ifilt.len() > 0
       { c.progm.ifilt.clone() } else { IFILT.to_string() };
+    self.renam = if c.progm.renam.len() > 0
+      { c.progm.renam.clone() } else { RENAM.to_string() };
     self.inpnm = if c.progm.inpnm.len() > 0
       { c.progm.inpnm.clone() } else { INPNM.to_string() };
     self.outnm = if c.progm.outnm.len() > 0
@@ -87,7 +86,7 @@ impl SettingsTp {
     self.found = false;
     for run in &self.cfd.run {
       if p.optn == run.optin {
-        if p.optn == "txc" {
+        if p.optn == "txc" && self.objnm == run.objnm {
           self.optin = p.optn.clone();
           self.objnm = if run.objnm.len() > 0
             { run.objnm.clone() } else { panic!("Object name is mandatory") };
@@ -95,6 +94,9 @@ impl SettingsTp {
             { run.modep.clone() } else { INDIV.to_string() };
           self.inpfl = if run.inpfl.len() > 0
             { run.inpfl.clone() } else { SAMPL.to_string() };
+          if run.renam.len() > 0 {
+            self.renam = run.renam.clone();
+          }
           if run.inpdr.len() > 0 {
             self.inpdr = run.inpdr.clone();
           }
@@ -102,17 +104,16 @@ impl SettingsTp {
             self.outdr = run.outdr.clone();
           }
           self.inppt = format!("{}{}", self.inpdr, self.inpfl);
+          println!("{}", self.inppt);
+          self.found = true;
+          break;
         }
-        self.found = true;
-        break;
       }
     }
   }
 }
 
-/*******************************************************************************
-** config.rs: Reads config file and gets run parameter                         *
-*******************************************************************************/
+// config.rs: Reads config file and gets run parameter -------------------------
 #[derive(Debug, Clone, Default, Deserialize)]
 pub struct KonstTp { // konst
   #[serde(default)]
@@ -136,6 +137,8 @@ pub struct ProgmTp { // progm
   #[serde(default)]
   pub ifilt: String, // inputs_filter
   #[serde(default)]
+  pub renam: String, // rename_files
+  #[serde(default)]
   pub inpnm: String, // inputs_naming
   #[serde(default)]
   pub outnm: String  // outputs_naming
@@ -155,6 +158,8 @@ pub struct RunTp {   // run
   pub inpfl: String, // input_file
   #[serde(default)]
   pub ifilt: String, // inputs_filter
+  #[serde(default)]
+  pub renam: String, // rename_files
   #[serde(default)]
   pub inpnm: String, // inputs_naming
   #[serde(default)]
@@ -184,9 +189,7 @@ impl ConfigTp {
   }
 }
 
-/*******************************************************************************
-** params.rs: Gets a list of command-line parameters                           *
-*******************************************************************************/
+// params.rs: Gets a list of command-line parameters ---------------------------
 #[derive(Debug, Clone, Default)]
 pub struct ParameTp {
   pub optn: String,

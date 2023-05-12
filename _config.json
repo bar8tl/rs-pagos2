@@ -10,6 +10,7 @@
     "inpdr": ".\\files\\input\\",
     "outdr": ".\\files\\output\\",
     "ifilt": "!(*processed*)",
+    "renam": "no",
     "inpnm": "dtsys'_'+inpfl'_inp_processed'",
     "outnm": "dtsys'_'+inpfl'_out'"
   },
@@ -17,6 +18,10 @@
     {
       "optin": "txc", "objnm": "edicom-bbm", "modep": "INDIV",
       "inpfl": "edicom-bbm.xlsx"
+    },
+    {
+      "optin": "txc", "objnm": "edicom-aa",  "modep": "INDIV",
+      "inpfl": "9040_COMPIRI_AA.xlsx"
     },
     {
       "optin": "txc", "objnm": "edicom-dc",  "modep": "INDIV",
